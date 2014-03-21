@@ -6,11 +6,12 @@ from config import CODING, NOW, CONTENTPATH, OUTPUTPATH, PELCONFIG, IMGSUBPATH, 
 
 def writefile(filename, content):
     '''writes content in filename'''
-    if not path.exists(path.dirname(filename)):
+    if path.exists(path.dirname(filename)):
+        with open(filename, 'w') as fileh:
+            fileh.write(content)
+    else:
         print('%s does not exist' %(path.dirname(filename)))
         return
-    with open(filename, 'w') as fileh:
-        fileh.write(content)
 
 def _getdate(nicefmt=True):
     '''date'''
@@ -82,7 +83,6 @@ def getpost(gateway):
 def localrun(cmdline):
     '''runs a command on the local shell'''
     try:
-        print(cmdline)
         pres = Popen(cmdline.split(' '), stderr=PIPE, stdout=PIPE)
         return '\n'.join([p.decode(encoding=CODING) for p in pres.communicate()])
 
@@ -111,5 +111,6 @@ def remoteget(gateway, sources, target):
             return
 
 def make_pelican():
+    '''builds pelican posts'''
     return localrun('pelican %s -o %s -s %s' %(CONTENTPATH, OUTPUTPATH, PELCONFIG))
 

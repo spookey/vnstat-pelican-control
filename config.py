@@ -30,7 +30,7 @@ GATELIST = {
         'ssh_host': 'ns3095578.ip-94-23-58.eu',
         'ssh_user': 'monitor',
         'ssh_port': '22',
-        'ssh_identity': path.join(path.expanduser('~'), '.ssh/ovh_monitor_rsa'),
+        'ssh_identity': path.join(path.expanduser('~'), '.ssh/gate05_monitor_rsa'),
         'file_path': '/home/monitor/stats',
         'graph_devices': ['eth0'],
         'test_test': 'Wurst',
