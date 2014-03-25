@@ -1,29 +1,35 @@
 '''configures things'''
 
-from os import path
-from datetime import datetime
+from os import path, pardir
 
-NOW = datetime.now()
-MODULEPATH = path.dirname(path.realpath(__file__))
-CONTENTPATH = path.join(MODULEPATH, '../content')
-IMGSUBPATH = 'images'
-IMGPATH = path.join(CONTENTPATH, IMGSUBPATH)
-OUTPUTPATH = path.join(MODULEPATH, '../output')
-# PELCONFIG = path.join(MODULEPATH, '../publishconf.py')
-PELCONFIG = path.join(MODULEPATH, '../pelicanconf.py')
+MODULE_PATH = path.dirname(path.realpath(__file__))
+PELIC_PATH = path.realpath(path.join(MODULE_PATH, pardir))
+PELIC_CONTENT = path.join(PELIC_PATH, 'content')
+PELIC_IMAGESUB = 'images'
+PELIC_IMAGE = path.join(PELIC_CONTENT, PELIC_IMAGESUB)
+PELIC_OUTPUT = path.join(PELIC_PATH, 'output')
+PELIC_CONFIG = path.join(PELIC_PATH, 'pelicanconf.py')
+def pelic_theme(tailp):
+    return path.join(PELIC_PATH, tailp)
 
+VERBOSE = False
 CODING = 'UTF-8'
 
-POSTCONTENT = '''Title: {gateway} Status {date}
-Date: {date} {time}
+POSTCONTENT = '''
+Title: {gateway} Status {date}
+Date: {date} 23:23
 Category: {gateway} Status
-Tags: {tyear}-{tmonth}, {tyear}, {tmonth}, {tday}
+Tags: {year}-{month}, {year}, {month}, {day}, {ifaces}
 
-{gateway} Status: {date}, {time}
+{gateway} Status: {date}
 
 '''
 
-POSTIMAGES = '![{gateway} Status {date} {time}]({{filename}}/{imgfile})'
+POSTIMAGES = '''
+##{iface}
+
+![{gateway} Status {filedate}]({{filename}}/{imgfile})
+'''
 
 GATELIST = {
     'Gate05': {
@@ -33,6 +39,5 @@ GATELIST = {
         'ssh_identity': path.join(path.expanduser('~'), '.ssh/gate05_monitor_rsa'),
         'file_path': '/home/monitor/stats',
         'graph_devices': ['eth0'],
-        'test_test': 'Wurst',
     },
 }
