@@ -66,7 +66,7 @@ class Names(object):
     def image_pelic(self):
         result = dict()
         for iface in self.gate['graph_devices']:
-            result[iface] = path.join(PELIC_IMAGESUB, '_'.join([self.gatename, iface, self.date.filedate()]) + '_test.png')
+            result[iface] = path.join(PELIC_IMAGESUB, '_'.join([self.gatename, iface, self.date.filedate()]) + '.png')
         return result
 
     def _vnstat_cmds(self):

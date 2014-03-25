@@ -12,7 +12,7 @@ PELIC_CONFIG = path.join(PELIC_PATH, 'pelicanconf.py')
 def pelic_theme(tailp):
     return path.join(PELIC_PATH, tailp)
 
-VERBOSE = False
+VERBOSE = True
 CODING = 'UTF-8'
 
 POSTCONTENT = '''
