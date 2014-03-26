@@ -2,43 +2,30 @@
 
 from datetime import date
 from names import Dates, Names
-from config import VERBOSE, GATELIST, PELIC_CONFIG, PELIC_CONTENT, PELIC_OUTPUT, pelic_theme
-from pelican.settings import get_settings_from_file, configure_settings
-from pelican import Pelican
+from config import GATELIST
+from helper import message, mkpelican
 
 class Worker(object):
+    '''does the work'''
     wrkday = None
+    gatelist = None
 
     def __init__(self, wrkday):
         self.wrkday = Dates(wrkday)
         self.gatelist = GATELIST
 
-    def mkpelican(self):
-        '''builds pelican posts'''
-        psettings = get_settings_from_file(PELIC_CONFIG)
-        psettings['PATH'] = PELIC_CONTENT
-        psettings['OUTPUT_PATH'] = PELIC_OUTPUT
-        psettings['THEME'] = pelic_theme(psettings['THEME'])
-
-        p = Pelican(configure_settings(psettings))
-        p.run()
-
-
     def run(self):
+        '''takes and downloads pictures, makes posts, rides the pelican'''
         for gate in self.gatelist.keys():
-            gn = Names(gate, self.wrkday)
+            gtn = Names(gate, self.wrkday)
             if self.wrkday.date() == Dates(date.today()).date():
-                if VERBOSE:
-                    print(':: this is today, say cheese')
-                print(gn.snapshot())
-            if VERBOSE:
-                    print(':: trying to load graph')
-            print(gn.getsnapshot())
+                message('this is today, say cheese', shout=True)
+                message(gtn.snapshot(), shout=True)
+            message('trying to load graph', shout=True)
+            message(gtn.getsnapshot(), shout=True)
 
-            if VERBOSE:
-                print(':: writing article')
-            gn.mkpost()
+            message('writing article', shout=True)
+            gtn.mkpost()
 
-        if VERBOSE:
-            print(':: feeding the pelican')
-        print(self.mkpelican())
+        message('feeding the pelican', shout=True)
+        mkpelican()
