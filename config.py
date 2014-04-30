@@ -10,6 +10,8 @@ PELIC_IMAGESUB = 'images'
 PELIC_IMAGE = path.join(PELIC_CONTENT, PELIC_IMAGESUB)
 PELIC_OUTPUT = path.join(PELIC_PATH, 'output')
 PELIC_CONFIG = path.join(PELIC_PATH, 'pelicanconf.py')
+GATES_PATH =  path.join(PELIC_PATH, 'gates')
+GATELIST = path.join(GATES_PATH, 'hosts.json')
 
 VERBOSE = False
 CODING = 'UTF-8'
@@ -30,15 +32,9 @@ POSTIMAGES = '''
 ![{gateway} Status {filedate}]({{filename}}/{imgfile})
 '''
 
-GATELIST = {
-    'Gate05': {
-        'ssh_host': 'ns3095578.ip-94-23-58.eu',
-        'ssh_user': 'monitor',
-        'ssh_port': '22',
-        'ssh_identity': path.join(
-            path.expanduser('~'), '.ssh/gate05_monitor_rsa'
-            ),
-        'file_path': '/home/monitor/stats',
-        'graph_devices': ['eth0'],
-    },
-}
+POSTCOMMAND = '''
+####{command}
+
+{commandoutput}
+'''
+

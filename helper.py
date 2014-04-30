@@ -1,18 +1,26 @@
 '''helps doing things'''
 
 from os import path
+from json import loads
 from subprocess import PIPE, Popen
 from pelican.settings import get_settings_from_file, configure_settings
 from pelican import Pelican
 from logging import getLogger, Formatter, INFO
 from logging.handlers import RotatingFileHandler
-from config import VERBOSE, CODING, LOGFILE, PELIC_PATH, PELIC_CONFIG, PELIC_CONTENT, PELIC_OUTPUT
+from config import VERBOSE, CODING, LOGFILE, GATES_PATH, GATELIST, PELIC_PATH, PELIC_CONFIG, PELIC_CONTENT, PELIC_OUTPUT
 
 FILEHANDLER = RotatingFileHandler(LOGFILE, 'a', 1 * 1024 * 1024, 10)
 FILEHANDLER.setFormatter(Formatter('%(asctime)s %(levelname)s: %(message)s'))
 LOG = getLogger('vnstat-pelican-control')
 LOG.setLevel(INFO)
 LOG.addHandler(FILEHANDLER)
+
+def getgatelist():
+    if path.exists(GATELIST):
+        result = dict()
+        with open(GATELIST, 'r') as jf:
+            result = loads(jf.read())
+        return result
 
 def message(msg, level=None, shout=False, *args, **kwargs):
     '''logs output'''
@@ -48,6 +56,7 @@ def localrun(cmdline):
 
 def remoterun(user, host, port, key_file, command):
     '''runs a command on a remote shell'''
+    key_file = path.join(GATES_PATH, key_file)
     cmdline = 'ssh -p %s -i %s %s@%s %s' %(port, key_file, user, host, command)
     return localrun(cmdline)
 
@@ -59,6 +68,7 @@ def remoteget(user, host, port, key_file, sources, target):
             sfiles = '{' + ','.join(sources) + '}'
         else:
             sfiles = ''.join(sources)
+        key_file = path.join(GATES_PATH, key_file)
         cmdline = 'scp -P %s -i %s %s@%s:%s %s' %(port, key_file, user, host, sfiles, target)
         return localrun(cmdline)
     else:

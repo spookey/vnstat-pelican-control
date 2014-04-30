@@ -2,8 +2,8 @@
 
 from os import path
 from datetime import date
-from config import GATELIST, PELIC_IMAGESUB, PELIC_CONTENT, PELIC_IMAGE, POSTCONTENT, POSTIMAGES
-from helper import message, remoterun, remoteget, writefile
+from config import PELIC_IMAGESUB, PELIC_CONTENT, PELIC_IMAGE, POSTCONTENT, POSTIMAGES, POSTCOMMAND
+from helper import message, remoterun, remoteget, writefile, getgatelist
 
 class Dates(object):
     '''watches in his pocket calendar'''
@@ -13,7 +13,7 @@ class Dates(object):
         if isinstance(wrkday, date):
             self.wrkday = wrkday
         else:
-            raise
+            raise Exception('wrong datetime.date object')
         self.__postinit()
 
     def __postinit(self):
@@ -47,14 +47,16 @@ class Names(object):
     gate = None
     gatename = None
     date = None
+    rcmdout = None
 
     def __init__(self, gateway, wrkdate):
-        if GATELIST[gateway]:
-            self.gate = GATELIST[gateway]
+        if getgatelist()[gateway]:
+            self.gate = getgatelist()[gateway]
             self.gatename = gateway
             self.date = wrkdate
+            self.rcmdout = None
         else:
-            raise
+            raise Exception('wrong names.Dates object')
         msg = 'current gate: %s' %(gateway)
         message(msg)
         message('.' * len(msg))
@@ -123,6 +125,19 @@ class Names(object):
         '''all local existing images (for a post)'''
         return [iface for iface, state in self._check_images().items() if state is True]
 
+    def remotecommands(self):
+        '''run remote commands'''
+        if self.gate['commands']:
+            self.rcmdout = dict()
+            for command in self.gate['commands']:
+                self.rcmdout[command] = remoterun(
+                    self.gate['ssh_user'],
+                    self.gate['ssh_host'],
+                    self.gate['ssh_port'],
+                    self.gate['ssh_identity'],
+                    command
+                    )
+
     def markdown_path(self):
         '''where is my markdown file today?'''
         return path.join(PELIC_CONTENT, '%s_%s.md' %(self.gatename, self.date.filedate()))
@@ -146,9 +161,16 @@ class Names(object):
             year=self.date.year(), month=self.date.month(), day=self.date.day()
             ).lstrip() + imageblock
 
+        if self.rcmdout:
+            rcmdlist = self.rcmdout.keys()
+            for rcommand in sorted(rcmdlist):
+                rcblock = str()
+                for rcline in self.rcmdout[rcommand].split('\n'):
+                    rcblock += '\n\t%s' %(rcline)
+                content += POSTCOMMAND.format(command=rcommand, commandoutput=rcblock)
 
         if len(images) == 0:
-            message('no images found ~ skipping', level=False)
+            message('no images for %s [%s] found. skipping' %(self.gatename, self.date.date()), level=False)
             return
         return content
 
